@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Journey Together 🚗</title>
+    <style>
+        :root {
+            --road-color: #555;
+            --line-color: #fff;
+            --grass-color: #8fbc8f;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--grass-color);
+            overflow-x: hidden;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            padding: 50px 20px;
+            color: white;
+            background: #2e8b57;
+            margin-bottom: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 { margin: 0; font-size: 2.5rem; }
+        p { margin-top: 10px; font-size: 1.2rem; opacity: 0.9; }
+
+        /* THE ROAD CONTAINER */
+        .timeline-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 50px 0;
+            /* We need height to scroll through */
+            min-height: 2000px; 
+        }
+
+        /* THE ROAD STRIP */
+        .road {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 100%;
+            background-color: var(--road-color);
+            border-left: 5px solid rgba(0,0,0,0.1);
+            border-right: 5px solid rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+
+        /* dashed line in center */
+        .road::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--line-color) 50%, transparent 50%);
+            background-size: 4px 40px; /* creates dashes */
+        }
+
+        /* THE CAR AVATAR */
+        #car {
+            position: fixed; /* Fixed relative to screen so it stays in view? No, we want absolute to track scroll */
+            position: absolute; 
+            top: 20px; /* Start near top */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 80px;
+            z-index: 5;
+            transition: top 0.1s linear; /* smooth movement */
+            background: url('https://cdn-icons-png.flaticon.com/512/3097/3097180.png') no-repeat center center;
+            background-size: contain;
+            /* Simple car icon. You can replace URL with a photo of your face or a different car */
+        }
+
+        /* MILESTONES */
+        .milestone {
+            position: absolute;
+            width: 45%; /* occupy left or right side */
+            left: 50%; /* Default to center line */
+            padding: 20px;
+            box-sizing: border-box;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+            z-index: 2;
+        }
+
+        .milestone.left {
+            left: 0;
+            text-align: right;
+            padding-right: 60px; /* Space from road */
+        }
+
+        .milestone.right {
+            left: 55%; /* Push to right side */
+            text-align: left;
+            padding-left: 20px;
+        }
+
+        /* The Content Box (Bubble) */
+        .content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        /* Arrow pointing to road */
+        .milestone.left .content::after {
+            content: '';
+            position: absolute;
+            right: -10px; top: 20px;
+            border-width: 10px 0 10px 10px;
+            border-style: solid;
+            border-color: transparent transparent transparent white;
+        }
+
+        .milestone.right .content::after {
+            content: '';
+            position: absolute;
+            left: -10px; top: 20px;
+            border-width: 10px 10px 10px 0;
+            border-style: solid;
+            border-color: transparent white transparent transparent;
+        }
+
+        /* Marker dot on the road */
+        .marker {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: #ff4757;
+            border: 4px solid white;
+            border-radius: 50%;
+            z-index: 3;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        /* Images in milestone */
+        .content img {
+            width: 100%;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .date {
+            color: #ff4757;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        /* Triggered State */
+        .milestone.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* END MESSAGE */
+        .finish-line {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            padding-bottom: 50px;
+        }
+        
+        .finish-line h2 {
+            background: #fff;
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            color: #2e8b57;
+        }
+
+        /* Mobile Fix */
+        @media (max-width: 600px) {
+            .road { width: 60px; left: 10%; transform: none; }
+            .road::after { left: 50%; }
+            #car { left: 10%; transform: translateX(-15%); width: 40px; }
+            
+            .marker { left: 10%; margin-left: 30px; } /* Adjust marker to road center */
+
+            .milestone {
+                width: 80%;
+                left: 20% !important; /* All content on right */
+                text-align: left !important;
+                padding-left: 20px !important;
+                padding-right: 0 !important;
+            }
+
+            .milestone.left .content::after {
+                right: auto; left: -10px;
+                border-width: 10px 10px 10px 0;
+                border-color: transparent white transparent transparent;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Our Journey ❤️</h1>
+        <p>Scroll to drive down memory lane...</p>
+    </header>
+
+    <div class="timeline-container">
+        <div class="road"></div>
+        <div id="car"></div>
+
+        <div class="marker" style="top: 200px;"></div>
+        <div class="milestone left" style="top: 180px;">
+            <div class="content">
+                <span class="date">Feb 14, 2020</span>
+                <h3>The First Date</h3>
+                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80" alt="Date">
+                <p>We grabbed coffee and talked for 4 hours straight. I knew then.</p>
+            </div>
+        </div>
+
+        <div class="marker" style="top: 600px;"></div>
+        <div class="milestone right" style="top: 580px;">
+            <div class="content">
+                <span class="date">July 20, 2021</span>
+                <h3>Our First Trip</h3>
+                <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=400&q=80" alt="Trip">
+                <p>Getting lost in the mountains but not caring because I was with you.</p>
+            </div>
+        </div>
+
+        <div class="marker" style="top: 1000px;"></div>
+        <div class="milestone left" style="top: 980px;">
+            <div class="content">
+                <span class="date">Dec 25, 2022</span>
+                <h3>Moving In</h3>
+                <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=400&q=80" alt="Home">
+                <p>Boxes everywhere, pizza on the floor. Our first home.</p>
+            </div>
+        </div>
+
+        <div class="marker" style="top: 1400px;"></div>
+        <div class="milestone right" style="top: 1380px;">
+            <div class="content">
+                <span class="date">Today</span>
+                <h3>Happy Valentine's Day</h3>
+                <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=400&q=80" alt="Love">
+                <p>To many more miles together. I love you!</p>
+            </div>
+        </div>
+
+        <div class="finish-line">
+            <h2>Start of Forever...</h2>
+        </div>
+    </div>
+
+    <script>
+        const car = document.getElementById('car');
+        const container = document.querySelector('.timeline-container');
+        const milestones = document.querySelectorAll('.milestone');
+
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const containerTop = container.offsetTop;
+            const containerHeight = container.offsetHeight;
+            const windowHeight = window.innerHeight;
+
+            // 1. Move the Car
+            // We calculate how far we are into the container
+            let carPos = scrollY - containerTop + (windowHeight / 2); 
+            
+            // Boundary checks (keep car inside road)
+            if (carPos < 0) carPos = 0;
+            if (carPos > containerHeight - 80) carPos = containerHeight - 80;
+
+            car.style.top = `${carPos}px`;
+
+            // 2. Trigger Milestones
+            milestones.forEach(milestone => {
+                const milestoneTop = parseInt(milestone.style.top);
+                // If car has passed the milestone (with some buffer), show it
+                if (carPos > milestoneTop - 100) {
+                    milestone.classList.add('visible');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
